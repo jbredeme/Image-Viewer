@@ -232,9 +232,9 @@ static void error_callback(int error, const char* description) {
 /**
  * key_callback
  *
- * @param
- * @param 
- * @param
+ * @param TODO
+ * @param TODO
+ * @param TODO
  */
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {			//<= Close Window
@@ -263,64 +263,53 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 /**
  * glCompileShaderOrDie
  *
- * @param
- * @param 
- * @param
+ * @param TODO
+ * @param TODO 
+ * @param TODO
  */
 void glCompileShaderOrDie(GLuint shader) {
-  GLint compiled;
-  glCompileShader(shader);
-  glGetShaderiv(shader,
-		GL_COMPILE_STATUS,
-		&compiled);
-  if (!compiled) {
-    GLint infoLen = 0;
-    glGetShaderiv(shader,
-		  GL_INFO_LOG_LENGTH,
-		  &infoLen);
-    char* info = malloc(infoLen+1);
-    GLint done;
-    glGetShaderInfoLog(shader, infoLen, &done, info);
-    printf("Unable to compile shader: %s\n", info);
-    exit(1);
-  }
+	GLint compiled;
+	glCompileShader(shader);
+	glGetShaderiv(shader, GL_COMPILE_STATUS, &compiled);
+	
+	if (!compiled) {
+		GLint infoLen = 0;
+		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &infoLen);
+		char* info = malloc(infoLen + 1);
+		GLint done;
+		glGetShaderInfoLog(shader, infoLen, &done, info);
+		printf("Unable to compile shader: %s\n", info);
+		exit(1);
+	}
+	
 }
 
 
-unsigned char image[] = {
-  255, 0, 0, 255,
-  255, 0, 0, 255,
-  255, 0, 0, 255,
-  255, 0, 0, 255,
 
-  0, 255, 0, 255,
-  0, 255, 0, 255,
-  0, 255, 0, 255,
-  0, 255, 0, 255,
-
-  0, 0, 255, 255,
-  0, 0, 255, 255,
-  0, 0, 255, 255,
-  0, 0, 255, 255,
-
-  255, 0, 255, 255,
-  255, 0, 255, 255,
-  255, 0, 255, 255,
-  255, 0, 255, 255
-};
 
 int main(int argc, char *argv[]) {
-	FILE *fpointer;
+	
 	Image *ppm_image;
+	ppm_image = (Image *)malloc(sizeof(Image));
+	
+	// Check number of inputs
+	if(argc != 2) {
+		fprintf(stderr, "Error, incorrect usage. ezview <input>.ppm\n");
+		exit(-1);
+	
+	// Num inputs pass, proceed to reading in the ppm image file
+	} else {
+		read_image(argv[1], ppm_image);
+		
+	}
 	
     GLFWwindow* window;
     GLuint vertex_buffer, vertex_shader, fragment_shader, program;
     GLint mvp_location, vpos_location, vcol_location;
-
     glfwSetErrorCallback(error_callback);
 
     if (!glfwInit())
-        exit(EXIT_FAILURE);
+		exit(EXIT_FAILURE);
 	
 	glfwDefaultWindowHints();
 	glfwWindowHint(GLFW_CONTEXT_CREATION_API, GLFW_EGL_CONTEXT_API);
@@ -328,11 +317,11 @@ int main(int argc, char *argv[]) {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 
-    window = glfwCreateWindow(640, 480, "Simple example", NULL, NULL);
-    if (!window)
-    {
+    window = glfwCreateWindow(ppm_image->width, ppm_image->height, "Simple example", NULL, NULL);
+    if (!window) {
         glfwTerminate();
         exit(EXIT_FAILURE);
+		
     }
 
     glfwSetKeyCallback(window, key_callback);
@@ -342,7 +331,6 @@ int main(int argc, char *argv[]) {
     glfwSwapInterval(1);
 
     // NOTE: OpenGL error checks have been omitted for brevity
-
     glGenBuffers(1, &vertex_buffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertex_buffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertexes), vertexes, GL_STATIC_DRAW);
@@ -374,57 +362,43 @@ int main(int argc, char *argv[]) {
     assert(tex_location != -1);
 
     glEnableVertexAttribArray(vpos_location);
-    glVertexAttribPointer(vpos_location,
-			  2,
-			  GL_FLOAT,
-			  GL_FALSE,
-                          sizeof(Vertex),
-			  (void*) 0);
+    glVertexAttribPointer(vpos_location, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*) 0);
 
     glEnableVertexAttribArray(texcoord_location);
-    glVertexAttribPointer(texcoord_location,
-			  2,
-			  GL_FLOAT,
-			  GL_FALSE,
-                          sizeof(Vertex),
-			  (void*) (sizeof(float) * 2));
-    
-    int image_width = 4;
-    int image_height = 4;
+    glVertexAttribPointer(texcoord_location, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*) (sizeof(float) * 2));
 
     GLuint texID;
     glGenTextures(1, &texID);
     glBindTexture(GL_TEXTURE_2D, texID);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image_width, image_height, 0, GL_RGBA, 
-		 GL_UNSIGNED_BYTE, image);
+	
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, ppm_image->width, ppm_image->height, 0, GL_RGB, 
+		 GL_UNSIGNED_BYTE, ppm_image->image_data);
 
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, texID);
     glUniform1i(tex_location, 0);
 
-    while (!glfwWindowShouldClose(window))
-    {
+    while (!glfwWindowShouldClose(window)) {
         float ratio;
         int width, height;
         mat4x4 m, p, mvp;
 
         glfwGetFramebufferSize(window, &width, &height);
-        ratio = width / (float) height;
+        ratio = (float) width / height;
 
         glViewport(0, 0, width, height);
         glClear(GL_COLOR_BUFFER_BIT);
 
         mat4x4_identity(m);
-        mat4x4_rotate_Z(m, m, (float) glfwGetTime());
+        //mat4x4_rotate_Z(m, m, (float) glfwGetTime());
         mat4x4_ortho(p, -ratio, ratio, -1.f, 1.f, 1.f, -1.f);
         mat4x4_mul(mvp, p, m);
 
         glUseProgram(program);
         glUniformMatrix4fv(mvp_location, 1, GL_FALSE, (const GLfloat*) mvp);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
 
         glfwSwapBuffers(window);
         glfwPollEvents();
