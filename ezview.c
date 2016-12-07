@@ -1,19 +1,17 @@
-#include <OpenGL/gl.h>
+#define GLFW_DLL 1
+#define GL_GLEXT_PROTOTYPES
+#include <GLES2/gl2.h>
 #include <GLFW/glfw3.h>
-
-#include "../deps/linmath.h"
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
+#include "linmath.h"
 
 typedef struct {
   float Position[2];
   float TexCoord[2];
 } Vertex;
-
-// (-1, 1)  (1, 1)
-// (-1, -1) (1, -1)
 
 Vertex vertexes[] = {
   {{1, -1}, {0.99999, 0}},
@@ -33,7 +31,7 @@ static const char* vertex_shader_text =
 "}\n";
 
 static const char* fragment_shader_text =
-"varying vec2 TexCoordOut;\n"
+"varying lowp vec2 TexCoordOut;\n"
 "uniform sampler2D Texture;\n"
 "void main()\n"
 "{\n"
@@ -103,7 +101,10 @@ int main(void)
 
     if (!glfwInit())
         exit(EXIT_FAILURE);
-
+	
+	glfwDefaultWindowHints();
+	glfwWindowHint(GLFW_CONTEXT_CREATION_API, GLFW_EGL_CONTEXT_API);
+	glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
 
