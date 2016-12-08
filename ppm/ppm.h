@@ -8,6 +8,15 @@
  
 #ifndef ppm_h
 	#define ppm_h
+	
+	/**
+	 * Vertex position and TexCoord values
+	 */	
+	typedef struct Vertex {
+		float Position[2];
+		float TexCoord[2];
+	  
+	} Vertex;	
 
 	/**
 	 * Three 1 byte unsigned characters used to store RGB color
