@@ -170,6 +170,15 @@ void read_image(char *filename, Image *image) {
 }
 
 
+// Affine transformation values
+float xpos = 0.0;
+float ypos = 0.0;
+float translate_x = 0.0;
+float translate_y = 0.0;
+float translate_z = 0.0;
+float scaling_factor = 1.0;
+
+
 const GLubyte Indices[] = {
 	0, 1, 2,
 	2, 3, 0
@@ -241,7 +250,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 		glfwSetWindowShouldClose(window, GLFW_TRUE);
 		
 	} else if(key == GLFW_KEY_KP_8 && action == GLFW_PRESS) {     	//<= Scale(Up)
-		
+	
 	} else if(key == GLFW_KEY_KP_2 && action == GLFW_PRESS) {     	//<= Scale(Down)
 		
 	} else if(key == GLFW_KEY_KP_4 && action == GLFW_PRESS) {     	//<= Rotate(CCW)
@@ -383,15 +392,23 @@ int main(int argc, char *argv[]) {
     while (!glfwWindowShouldClose(window)) {
         float ratio;
         int width, height;
-        mat4x4 m, p, mvp;
+        mat4x4 m, p, mvp, rmat, tmat, smat, shma, arm;
+		
+		// Setup matrix identies
+		mat4x4_identity(m);
+		mat4x4_identity(rmat);
+		mat4x4_identity(tmat);
+		mat4x4_identity(smat);
+		mat4x4_identity(shma);
+		mat4x4_identity(arm);
 
         glfwGetFramebufferSize(window, &width, &height);
-        ratio = (float) width / height;
+        ratio = (float) width / (float) height;
 
         glViewport(0, 0, width, height);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        mat4x4_identity(m);
+        
         //mat4x4_rotate_Z(m, m, (float) glfwGetTime());
         mat4x4_ortho(p, -ratio, ratio, -1.f, 1.f, 1.f, -1.f);
         mat4x4_mul(mvp, p, m);
