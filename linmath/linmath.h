@@ -571,4 +571,17 @@ static inline void quat_from_mat4x4(quat q, mat4x4 M)
 	q[3] = (M[p[2]][p[1]] - M[p[1]][p[2]])/(2.f*r);
 }
 
+static inline void mat4x4_shear(mat4x4 Q, mat4x4 M, float x, float y){
+	vec4 yx = {{x}, {y}, {1}, {1}};
+	
+	mat4x4 R = {
+		{1.f,   y, 1.f, 0.f},
+		{  x, 1.f, 1.f, 0.f},
+		{1.f, 1.f, 1.f, 0.f},
+		{0.f, 0.f, 0.f, 1.f}
+	};
+	mat4x4_mul(Q, M, R);
+	
+}
+
 #endif
