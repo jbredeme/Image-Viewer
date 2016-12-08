@@ -8,7 +8,7 @@ Open GL image viewer that loads PPM images in P3 or P6 format and display the im
 ```c
 ezview input.ppm
 ```
-<img src="https://github.com/jbredeme/Image-Viewer/blob/master/examples/png/controls.png" width="256">
+<img src="https://github.com/jbredeme/Image-Viewer/blob/master/examples/png/controls.png" width="512">
 
 
 ## Resources
