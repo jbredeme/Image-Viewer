@@ -10,6 +10,20 @@
 #include <ctype.h>
 #include "ppm\ppm.h"
 #include "linmath\linmath.h"
+#define M_PI 3.14159265358979323846
+
+// Affine transformation values
+float xpos = 0.0;
+float ypos = 0.0;
+float xtranslate = 0.0;
+float ytranslate = 0.0;
+float ztranslate = 0.0;
+float translation_increment = 2.0;
+float scale = 1.0;
+float scaling_factor = 1.0;
+float rotation = 0.0;
+float rotation_increment = 2.0;
+float shear_factor = 0.0;
 
 
 /**
@@ -42,7 +56,6 @@ int check_rgb_bits(int red, int green, int blue, int max, int min) {
  * @param image - an image structure 
  */
 void read_image(char *filename, Image *image) {
-	
     char buffer[64];
 	FILE *fpointer;
 	int row, column, red, green, blue;
@@ -170,22 +183,6 @@ void read_image(char *filename, Image *image) {
 }
 
 
-// Affine transformation values
-float xpos = 0.0;
-float ypos = 0.0;
-float translate_x = 0.0;
-float translate_y = 0.0;
-float translate_z = 0.0;
-float scaling_factor = 1.0;
-
-
-const GLubyte Indices[] = {
-	0, 1, 2,
-	2, 3, 0
-  
-};
-
-
 typedef struct Vertex {
 	float Position[2];
 	float TexCoord[2];
@@ -249,21 +246,35 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {			//<= Close Window
 		glfwSetWindowShouldClose(window, GLFW_TRUE);
 		
-	} else if(key == GLFW_KEY_KP_8 && action == GLFW_PRESS) {     	//<= Scale(Up)
+	} else if(key == GLFW_KEY_Q && action == GLFW_PRESS) {     	//<= Scale(Up)
+		scale = scale + scaling_factor;
 	
-	} else if(key == GLFW_KEY_KP_2 && action == GLFW_PRESS) {     	//<= Scale(Down)
-		
-	} else if(key == GLFW_KEY_KP_4 && action == GLFW_PRESS) {     	//<= Rotate(CCW)
-		
-	} else if(key == GLFW_KEY_KP_6 && action == GLFW_PRESS) { 		//<= Rotate(CW)
-		
-	} else if(key == GLFW_KEY_KP_7 && action == GLFW_PRESS) { 		//<= Translation(Left)
-		
-	} else if(key == GLFW_KEY_KP_9 && action == GLFW_PRESS) { 		//<= Translation(Right)
-		
-	} else if(key == GLFW_KEY_KP_1 && action == GLFW_PRESS) { 		//<= Sheer(Left)
-		
-	} else if(key == GLFW_KEY_KP_3 && action == GLFW_PRESS) { 		//<= Sheer(Right)
+	} else if(key == GLFW_KEY_W && action == GLFW_PRESS) {     	//<= Scale(Down)
+		scale = scale - scaling_factor;
+	
+	} else if(key == GLFW_KEY_A && action == GLFW_PRESS) {      //<= Rotate(CCW)
+		rotation = rotation + (M_PI/rotation_increment);
+	
+	} else if(key == GLFW_KEY_S && action == GLFW_PRESS) { 		//<= Rotate(CW)
+		rotation = rotation - (M_PI/rotation_increment);
+	
+	} else if(key == GLFW_KEY_LEFT && action == GLFW_PRESS) { 	//<= Translation(Left)
+		xtranslate = xtranslate - translation_increment;
+	
+	} else if(key == GLFW_KEY_RIGHT && action == GLFW_PRESS) { 	//<= Translation(Right)
+		xtranslate = xtranslate + translation_increment;
+	
+	} else if(key == GLFW_KEY_UP  && action == GLFW_PRESS) { 	//<= Translation(Up)
+		ytranslate = ytranslate + translation_increment;
+	
+	} else if(key == GLFW_KEY_DOWN  && action == GLFW_PRESS) { 	//<= Translation(Down)
+		ytranslate = ytranslate - translation_increment;
+	
+	} else if(key == GLFW_KEY_Z && action == GLFW_PRESS) { 		//<= Sheer(Left)
+
+	
+	} else if(key == GLFW_KEY_X && action == GLFW_PRESS) { 		//<= Sheer(Right)
+
 		
 	}
         
@@ -294,13 +305,10 @@ void glCompileShaderOrDie(GLuint shader) {
 }
 
 
-
-
 int main(int argc, char *argv[]) {
-	
 	Image *ppm_image;
 	ppm_image = (Image *)malloc(sizeof(Image));
-	
+
 	// Check number of inputs
 	if(argc != 2) {
 		fprintf(stderr, "Error, incorrect usage. ezview <input>.ppm\n");
@@ -317,8 +325,9 @@ int main(int argc, char *argv[]) {
     GLint mvp_location, vpos_location, vcol_location;
     glfwSetErrorCallback(error_callback);
 
-    if (!glfwInit())
+    if (!glfwInit()) {
 		exit(EXIT_FAILURE);
+	}
 	
 	glfwDefaultWindowHints();
 	glfwWindowHint(GLFW_CONTEXT_CREATION_API, GLFW_EGL_CONTEXT_API);
@@ -336,7 +345,6 @@ int main(int argc, char *argv[]) {
     glfwSetKeyCallback(window, key_callback);
 
     glfwMakeContextCurrent(window);
-    // gladLoadGLLoader((GLADloadproc) glfwGetProcAddress);
     glfwSwapInterval(1);
 
     // NOTE: OpenGL error checks have been omitted for brevity
@@ -356,8 +364,8 @@ int main(int argc, char *argv[]) {
     glAttachShader(program, vertex_shader);
     glAttachShader(program, fragment_shader);
     glLinkProgram(program);
+	
     // more error checking! glLinkProgramOrDie!
-
     mvp_location = glGetUniformLocation(program, "MVP");
     assert(mvp_location != -1);
 
@@ -394,7 +402,7 @@ int main(int argc, char *argv[]) {
         int width, height;
         mat4x4 m, p, mvp, rmat, tmat, smat, shma, arm;
 		
-		// Setup matrix identies
+		// Setup matrices
 		mat4x4_identity(m);
 		mat4x4_identity(rmat);
 		mat4x4_identity(tmat);
@@ -403,13 +411,19 @@ int main(int argc, char *argv[]) {
 		mat4x4_identity(arm);
 
         glfwGetFramebufferSize(window, &width, &height);
-        ratio = (float) width / (float) height;
+        ratio = (float) width / height;
 
         glViewport(0, 0, width, height);
         glClear(GL_COLOR_BUFFER_BIT);
-
         
-        //mat4x4_rotate_Z(m, m, (float) glfwGetTime());
+		// Transformation Calculations
+		mat4x4_translate(tmat, xtranslate, ytranslate, ztranslate);
+		mat4x4_add(m, tmat, m);
+		mat4x4_scale_aniso(smat, smat, scale, scale, scale);
+		mat4x4_add(m, smat, m);
+		mat4x4_rotate_Z(rmat, rmat, rotation);
+		mat4x4_mul(m, rmat, m);
+		
         mat4x4_ortho(p, -ratio, ratio, -1.f, 1.f, 1.f, -1.f);
         mat4x4_mul(mvp, p, m);
 
@@ -422,9 +436,12 @@ int main(int argc, char *argv[]) {
     }
 
     glfwDestroyWindow(window);
-
     glfwTerminate();
+	
+	// Deallocate memory previously allocated by calls to malloc
+	free(ppm_image->image_data);
+	free(ppm_image);
+	
     exit(EXIT_SUCCESS);
 }
-
 //! [code]
