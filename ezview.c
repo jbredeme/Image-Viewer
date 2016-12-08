@@ -23,7 +23,8 @@ float scale = 1.0;
 float scaling_factor = 1.0;
 float rotation = 0.0;
 float rotation_increment = 2.0;
-float shear_factor = 0.0;
+float shear = 0.0;
+float shear_increment = 2.0;
 
 
 /**
@@ -183,6 +184,20 @@ void read_image(char *filename, Image *image) {
 }
 
 
+static inline void mat4x4_shear(mat4x4 Q, mat4x4 M, float x, float y){
+	vec4 yx = {{x}, {y}, {1}, {1}};
+	
+	mat4x4 R = {
+		{1.f,   y, 1.f, 0.f},
+		{  x, 1.f, 1.f, 0.f},
+		{1.f, 1.f, 1.f, 0.f},
+		{0.f, 0.f, 0.f, 1.f}
+	};
+	mat4x4_mul(Q, M, R);
+	
+}
+
+
 typedef struct Vertex {
 	float Position[2];
 	float TexCoord[2];
@@ -202,6 +217,7 @@ Vertex vertexes[] = {
   
 };
 
+
 static const char* vertex_shader_text =
 	"uniform mat4 MVP;\n"
 	"attribute vec2 TexCoordIn;\n"
@@ -213,6 +229,7 @@ static const char* vertex_shader_text =
 	"    TexCoordOut = TexCoordIn;\n"
 	"}\n";
 
+	
 static const char* fragment_shader_text =
 	"varying lowp vec2 TexCoordOut;\n"
 	"uniform sampler2D Texture;\n"
@@ -271,14 +288,15 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 		ytranslate = ytranslate - translation_increment;
 	
 	} else if(key == GLFW_KEY_Z && action == GLFW_PRESS) { 		//<= Sheer(Left)
-
+		shear = shear + shear_increment;
 	
 	} else if(key == GLFW_KEY_X && action == GLFW_PRESS) { 		//<= Sheer(Right)
-
+		shear = shear - shear_increment;
 		
 	}
         
 }
+
 
 /**
  * glCompileShaderOrDie
@@ -398,41 +416,45 @@ int main(int argc, char *argv[]) {
     glUniform1i(tex_location, 0);
 
     while (!glfwWindowShouldClose(window)) {
-        float ratio;
-        int width, height;
-        mat4x4 m, p, mvp, rmat, tmat, smat, shma, arm;
-		
+		float ratio;
+		int width, height;
+		mat4x4 m, p, mvp, rmat, tmat, smat, shma;
+
 		// Setup matrices
 		mat4x4_identity(m);
 		mat4x4_identity(rmat);
 		mat4x4_identity(tmat);
 		mat4x4_identity(smat);
 		mat4x4_identity(shma);
-		mat4x4_identity(arm);
 
-        glfwGetFramebufferSize(window, &width, &height);
-        ratio = (float) width / height;
+		glfwGetFramebufferSize(window, &width, &height);
+		ratio = (float) width / height;
 
-        glViewport(0, 0, width, height);
-        glClear(GL_COLOR_BUFFER_BIT);
-        
+		glViewport(0, 0, width, height);
+		glClear(GL_COLOR_BUFFER_BIT);
+
 		// Transformation Calculations
 		mat4x4_translate(tmat, xtranslate, ytranslate, ztranslate);
 		mat4x4_add(m, tmat, m);
+		
 		mat4x4_scale_aniso(smat, smat, scale, scale, scale);
 		mat4x4_add(m, smat, m);
+
+		mat4x4_shear(shma, shma, shear, shear);
+		mat4x4_add(m, shma, m);
+		
 		mat4x4_rotate_Z(rmat, rmat, rotation);
 		mat4x4_mul(m, rmat, m);
-		
-        mat4x4_ortho(p, -ratio, ratio, -1.f, 1.f, 1.f, -1.f);
-        mat4x4_mul(mvp, p, m);
 
-        glUseProgram(program);
-        glUniformMatrix4fv(mvp_location, 1, GL_FALSE, (const GLfloat*) mvp);
-        glDrawArrays(GL_TRIANGLES, 0, 6);
+		mat4x4_ortho(p, -ratio, ratio, -1.f, 1.f, 1.f, -1.f);
+		mat4x4_mul(mvp, p, m);
 
-        glfwSwapBuffers(window);
-        glfwPollEvents();
+		glUseProgram(program);
+		glUniformMatrix4fv(mvp_location, 1, GL_FALSE, (const GLfloat*) mvp);
+		glDrawArrays(GL_TRIANGLES, 0, 6);
+
+		glfwSwapBuffers(window);
+		glfwPollEvents();
     }
 
     glfwDestroyWindow(window);
