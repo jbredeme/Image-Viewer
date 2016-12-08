@@ -49,19 +49,6 @@ LINMATH_H_DEFINE_VEC(2)
 LINMATH_H_DEFINE_VEC(3)
 LINMATH_H_DEFINE_VEC(4)
 
-static inline void mat4x4_shear(mat4x4 Q, mat4x4 M, float x, float y){
-	vec4 yx = {{x}, {y}, {1}, {1}};
-	
-	mat4x4 R = {
-		{1.f,   y, 1.f, 0.f},
-		{  x, 1.f, 1.f, 0.f},
-		{1.f, 1.f, 1.f, 0.f},
-		{0.f, 0.f, 0.f, 1.f}
-	};
-	mat4x4_mul(Q, M, R);
-	
-}
-
 static inline void vec3_mul_cross(vec3 r, vec3 const a, vec3 const b)
 {
 	r[0] = a[1]*b[2] - a[2]*b[1];
