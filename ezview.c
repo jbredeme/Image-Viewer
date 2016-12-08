@@ -15,16 +15,15 @@
 // Affine transformation values
 float xpos = 0.0;
 float ypos = 0.0;
-float xtranslate = 0.0;
-float ytranslate = 0.0;
-float ztranslate = 0.0;
-float translation_increment = 2.0;
+float translate_xval = 0.0;
+float translate_yval = 0.0;
+float translate_val = .20;
 float scale = 1.0;
-float scaling_factor = 1.0;
+float scale_val = .50;
 float rotation = 0.0;
-float rotation_increment = 2.0;
+float rotation_val = 2.0;
 float shear = 0.0;
-float shear_increment = 2.0;
+float shear_val = .10;
 
 
 /**
@@ -184,27 +183,6 @@ void read_image(char *filename, Image *image) {
 }
 
 
-static inline void mat4x4_shear(mat4x4 Q, mat4x4 M, float x, float y){
-	vec4 yx = {{x}, {y}, {1}, {1}};
-	
-	mat4x4 R = {
-		{1.f,   y, 1.f, 0.f},
-		{  x, 1.f, 1.f, 0.f},
-		{1.f, 1.f, 1.f, 0.f},
-		{0.f, 0.f, 0.f, 1.f}
-	};
-	mat4x4_mul(Q, M, R);
-	
-}
-
-
-typedef struct Vertex {
-	float Position[2];
-	float TexCoord[2];
-  
-} Vertex;
-
-
 Vertex vertexes[] = {
 	{{-1, 1}, {0, 0}},
 	{{1, 1}, {1, 0}},
@@ -242,9 +220,6 @@ static const char* fragment_shader_text =
 /**
  * error_callback
  *
- * @param
- * @param 
- * @param
  */
 static void error_callback(int error, const char* description) {
     fprintf(stderr, "Error: %s\n", description);
@@ -253,57 +228,8 @@ static void error_callback(int error, const char* description) {
 
 
 /**
- * key_callback
- *
- * @param TODO
- * @param TODO
- * @param TODO
- */
-static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {			//<= Close Window
-		glfwSetWindowShouldClose(window, GLFW_TRUE);
-		
-	} else if(key == GLFW_KEY_Q && action == GLFW_PRESS) {     	//<= Scale(Up)
-		scale = scale + scaling_factor;
-	
-	} else if(key == GLFW_KEY_W && action == GLFW_PRESS) {     	//<= Scale(Down)
-		scale = scale - scaling_factor;
-	
-	} else if(key == GLFW_KEY_A && action == GLFW_PRESS) {      //<= Rotate(CCW)
-		rotation = rotation + (M_PI/rotation_increment);
-	
-	} else if(key == GLFW_KEY_S && action == GLFW_PRESS) { 		//<= Rotate(CW)
-		rotation = rotation - (M_PI/rotation_increment);
-	
-	} else if(key == GLFW_KEY_LEFT && action == GLFW_PRESS) { 	//<= Translation(Left)
-		xtranslate = xtranslate - translation_increment;
-	
-	} else if(key == GLFW_KEY_RIGHT && action == GLFW_PRESS) { 	//<= Translation(Right)
-		xtranslate = xtranslate + translation_increment;
-	
-	} else if(key == GLFW_KEY_UP  && action == GLFW_PRESS) { 	//<= Translation(Up)
-		ytranslate = ytranslate + translation_increment;
-	
-	} else if(key == GLFW_KEY_DOWN  && action == GLFW_PRESS) { 	//<= Translation(Down)
-		ytranslate = ytranslate - translation_increment;
-	
-	} else if(key == GLFW_KEY_Z && action == GLFW_PRESS) { 		//<= Sheer(Left)
-		shear = shear + shear_increment;
-	
-	} else if(key == GLFW_KEY_X && action == GLFW_PRESS) { 		//<= Sheer(Right)
-		shear = shear - shear_increment;
-		
-	}
-        
-}
-
-
-/**
  * glCompileShaderOrDie
  *
- * @param TODO
- * @param TODO 
- * @param TODO
  */
 void glCompileShaderOrDie(GLuint shader) {
 	GLint compiled;
@@ -320,6 +246,49 @@ void glCompileShaderOrDie(GLuint shader) {
 		exit(1);
 	}
 	
+}
+
+
+/**
+ * key_callback
+ *
+ */
+static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {			//<= Close Window
+		glfwSetWindowShouldClose(window, GLFW_TRUE);
+		
+	} else if(key == GLFW_KEY_Q && action == GLFW_PRESS) {     	//<= Scale(Up)
+		scale = scale + scale_val;
+	
+	} else if(key == GLFW_KEY_W && action == GLFW_PRESS) {     	//<= Scale(Down)
+		scale = scale - scale_val;
+	
+	} else if(key == GLFW_KEY_A && action == GLFW_PRESS) {      //<= Rotate(CCW)
+		rotation = rotation + (M_PI/rotation_val);
+	
+	} else if(key == GLFW_KEY_S && action == GLFW_PRESS) { 		//<= Rotate(CW)
+		rotation = rotation - (M_PI/rotation_val);
+	
+	} else if(key == GLFW_KEY_LEFT && action == GLFW_PRESS) { 	//<= Translate(Left)
+		translate_xval = translate_xval - translate_val;
+	
+	} else if(key == GLFW_KEY_RIGHT && action == GLFW_PRESS) { 	//<= Translate(Right)
+		translate_xval = translate_xval + translate_val;
+	
+	} else if(key == GLFW_KEY_UP  && action == GLFW_PRESS) { 	//<= Translate(Up)
+		translate_yval = translate_yval + translate_val;
+	
+	} else if(key == GLFW_KEY_DOWN  && action == GLFW_PRESS) { 	//<= Translate(Down)
+		translate_yval = translate_yval - translate_val;
+	
+	} else if(key == GLFW_KEY_Z && action == GLFW_PRESS) { 		//<= Sheer(Left)
+		shear = shear + shear_val;
+	
+	} else if(key == GLFW_KEY_X && action == GLFW_PRESS) { 		//<= Sheer(Right)
+		shear = shear - shear_val;
+		
+	}
+        
 }
 
 
@@ -418,14 +387,8 @@ int main(int argc, char *argv[]) {
     while (!glfwWindowShouldClose(window)) {
 		float ratio;
 		int width, height;
-		mat4x4 m, p, mvp, rmat, tmat, smat, shma;
-
-		// Setup matrices
+		mat4x4 m, p, mvp, rotate_mat, translate_mat, scale_mat, schear_mat;
 		mat4x4_identity(m);
-		mat4x4_identity(rmat);
-		mat4x4_identity(tmat);
-		mat4x4_identity(smat);
-		mat4x4_identity(shma);
 
 		glfwGetFramebufferSize(window, &width, &height);
 		ratio = (float) width / height;
@@ -434,17 +397,21 @@ int main(int argc, char *argv[]) {
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		// Transformation Calculations
-		mat4x4_translate(tmat, xtranslate, ytranslate, ztranslate);
-		mat4x4_add(m, tmat, m);
+		mat4x4_identity(translate_mat);
+		mat4x4_translate(translate_mat, translate_xval, translate_yval, 0);
+		mat4x4_add(m, translate_mat, m);
 		
-		mat4x4_scale_aniso(smat, smat, scale, scale, scale);
-		mat4x4_add(m, smat, m);
+		mat4x4_identity(scale_mat);
+		mat4x4_scale_aniso(scale_mat, scale_mat, scale, scale, scale);
+		mat4x4_add(m, scale_mat, m);
 
-		mat4x4_shear(shma, shma, shear, shear);
-		mat4x4_add(m, shma, m);
+		mat4x4_identity(schear_mat);	
+		mat4x4_shear(schear_mat, schear_mat, shear, shear);
+		mat4x4_add(m, schear_mat, m);
 		
-		mat4x4_rotate_Z(rmat, rmat, rotation);
-		mat4x4_mul(m, rmat, m);
+		mat4x4_identity(rotate_mat);
+		mat4x4_rotate_Z(rotate_mat, rotate_mat, rotation);
+		mat4x4_mul(m, rotate_mat, m);
 
 		mat4x4_ortho(p, -ratio, ratio, -1.f, 1.f, 1.f, -1.f);
 		mat4x4_mul(mvp, p, m);
