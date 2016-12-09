@@ -182,7 +182,7 @@ void read_image(char *filename, Image *image) {
 	
 }
 
-w
+
 Vertex vertexes[] = {
 	{{1.0, -1.0}, {0.9999, 0.9999}},
 	{{1.0, 1.0}, {0.9999, 0.0000}},
