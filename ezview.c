@@ -184,15 +184,12 @@ void read_image(char *filename, Image *image) {
 
 
 Vertex vertexes[] = {
-	{{-1, 1}, {0, 0}},
-	{{1, 1}, {1, 0}},
-
-	{{-1, -1}, {0, 1}},
-	{{1, 1}, {1, 0}},
-
-	{{1, -1}, {1, 1}},
-	{{-1, -1}, {0, 1}}
-  
+	{{  1.0, -1.0}, { 0.9999, 0.9999 }},
+	{{  1.0,  1.0}, { 0.9999, 0.0000 }},
+	{{ -1.0,  1.0}, { 0.0000, 0.0000 }},
+	{{ -1.0,  1.0}, { 0.0000, 0.0000 }},
+	{{ -1.0, -1.0}, { 0.0000, 0.9999 }},
+	{{  1.0, -1.0}, { 0.9999, 0.9999 }}
 };
 
 
@@ -328,7 +325,7 @@ int main(int argc, char *argv[]) {
         exit(EXIT_FAILURE);
 		
     }
-
+    
     glfwSetKeyCallback(window, key_callback);
 
     glfwMakeContextCurrent(window);
