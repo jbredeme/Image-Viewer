@@ -13,20 +13,18 @@ ezview input.ppm
 <img src="https://github.com/jbredeme/Image-Viewer/blob/master/examples/png/controls.png" width="512">
 
 ## Built With
-* [Cygwin] - 64-bit versions of Windows
-* GNU Compiler Collection (GCC) release 5.4.0
-* GNU Make release 4.2.1
+* [GLES2 Starter Kit] for Windows 32-bit
+* [Microsoft Visual Studio] - 2015 or later
 * Windows 10 Professional platform
 
 ## Author
-* **Jarid Bredemeier** - *Initial work*
+* **Jarid Bredemeier**
 
 ## Resources
-* [GLES2 Starter Kit] for WIN32
 * [GLFW]
 * [Learn OpenGL ES]
 
 [GLES2 Starter Kit]: https://bitbucket.org/jdpalmer/gles2-starter-kit
 [GLFW]: http://www.glfw.org/docs/latest/group__keys.html
 [Learn OpenGL ES]: http://www.learnopengles.com/tag/linmath-h/
-[Cygwin]: https://cygwin.com/index.html
+[Microsoft Visual Studio]: https://www.visualstudio.com/downloads/
