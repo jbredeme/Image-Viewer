@@ -14,7 +14,7 @@ ezview input.ppm
 
 ## Built With
 * [GLES2 Starter Kit] for Windows 32-bit
-* [Microsoft Visual Studio] - 2015 or later
+* [Microsoft Visual Studio] 2015 or later
 * Windows 10 Professional
 
 ## Author
