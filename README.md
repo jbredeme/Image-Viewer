@@ -1,5 +1,5 @@
 # Image Viewer
-Open GL image viewer that loads PPM images in P3 or P6 format and display the image in a window and implements keyboard controls to initiate affine transformations on the image.
+This is an Open GL image viewer that loads PPM images in P3 or P6 format and displays the image in a window. In addition this application  implements keyboard controls to initiate affine transformations on the loaded image.
  
 ## Screenshots
 <img src="https://github.com/jbredeme/Image-Viewer/blob/master/examples/png/original.png" width="256"> <img src="https://github.com/jbredeme/Image-Viewer/blob/master/examples/png/translate.png" width="256"> <img src="https://github.com/jbredeme/Image-Viewer/blob/master/examples/png/scale.png" width="256"><br />
