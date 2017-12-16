@@ -1,9 +1,9 @@
-# Image Viewer
+# Image Viewer ![Jarid_Bredemeier](https://img.shields.io/badge/build-passing-green.svg?style=flat-plastic)
 This is an Open GL image viewer that loads PPM images in P3 or P6 format and displays the image in a window. In addition this application  implements keyboard controls to initiate affine transformations on the loaded image.
  
 ## Screenshots
-<img src="https://github.com/jbredeme/Image-Viewer/blob/master/examples/png/original.png" width="256"> <img src="https://github.com/jbredeme/Image-Viewer/blob/master/examples/png/translate.png" width="256"> <img src="https://github.com/jbredeme/Image-Viewer/blob/master/examples/png/scale.png" width="256"><br />
-<img src="https://github.com/jbredeme/Image-Viewer/blob/master/examples/png/shear.png" width="256"> <img src="https://github.com/jbredeme/Image-Viewer/blob/master/examples/png/rotate.png" width="256">
+<img src="https://github.com/jbredeme/Image-Viewer/blob/master/examples/png/original.png" width="288"> <img src="https://github.com/jbredeme/Image-Viewer/blob/master/examples/png/translate.png" width="288"> <img src="https://github.com/jbredeme/Image-Viewer/blob/master/examples/png/scale.png" width="288"><br />
+<img src="https://github.com/jbredeme/Image-Viewer/blob/master/examples/png/shear.png" width="288"> <img src="https://github.com/jbredeme/Image-Viewer/blob/master/examples/png/rotate.png" width="288">
 
 ## Usage
 ```c
